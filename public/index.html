@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<title>GREEN-API</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+		}
+
+		.container {
+			display: flex;
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.form-container,
+		.response-container {
+			flex: 1;
+			padding: 20px;
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 5px;
+		}
+
+		input[type="text"],
+		textarea {
+			width: 100%;
+			padding: 10px;
+			box-sizing: border-box;
+		}
+
+		button {
+			padding: 10px 15px;
+			background-color: #4cae4f;
+			color: white;
+			border: none;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background-color: #00c753;
+		}
+
+		textarea[readonly] {
+			background-color: #f9f9f9;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="form-container">
+			<h1>GREEN-API</h1>
+			<div class="form-group">
+				<label for="idInstance">Instance ID:</label>
+				<input type="text" id="idInstance" placeholder="Введите idInstance">
+			</div>
+			<div class="form-group">
+				<label for="apiTokenInstance">Instance API Token:</label>
+				<input type="text" id="apiTokenInstance" placeholder="Введите apiTokenInstance">
+			</div>
+			<div class="form-group">
+				<button onclick="getSettings()">Get Settings</button>
+				<button onclick="getStateInstance()">Get Instance State</button>
+			</div>
+			<div class="form-group">
+				<label for="chatId">Chat ID:</label>
+				<input type="text" id="chatId" placeholder="Введите Chat ID">
+			</div>
+			<div class="form-group">
+				<label for="message">Message:</label>
+				<input type="text" id="message" placeholder="Введите Message">
+			</div>
+			<div class="form-group">
+				<button onclick="sendMessage()">Send Message</button>
+			</div>
+			<div class="form-group">
+				<label for="fileName">File Name:</label>
+				<input type="text" id="fileName" placeholder="Введите имя файла">
+			</div>
+			<div class="form-group">
+				<label for="urlFile">URL File:</label>
+				<input type="text" id="urlFile" placeholder="Введите URL файла">
+			</div>
+			<div class="form-group">
+				<button onclick="sendFileByUrl()">Send File By URL</button>
+			</div>
+		</div>
+		<div class="response-container">
+			<h2>Ответ:</h2>
+			<textarea id="response" rows="20" readonly></textarea>
+		</div>
+	</div>
+
+	<script>
+		async function callApi(endpoint) {
+			const idInstance = document.getElementById('idInstance').value;
+			const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+
+			if (!idInstance || !apiTokenInstance) {
+				alert('Пожалуйста, заполните Instance ID и Instance API Token');
+				return;
+			}
+
+			try {
+				const response = await fetch(`/api/${endpoint}`, {
+					method: 'GET',
+					headers: {
+						'X-Instance-Id': idInstance,
+						'X-Instance-Token': apiTokenInstance,
+					}
+				});
+				const data = await response.text();
+				document.getElementById('response').value = data;
+			} catch (error) {
+				document.getElementById('response').value = `Ошибка: ${error.message}`;
+			}
+		}
+
+		async function callApiWithBody(endpoint, body) {
+			const idInstance = document.getElementById('idInstance').value;
+			const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+
+			if (!idInstance || !apiTokenInstance) {
+				alert('Пожалуйста, заполните Instance ID и Instance API Token');
+				return;
+			}
+
+			try {
+				const response = await fetch(`/api/${endpoint}`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Instance-Id': idInstance,
+						'X-Instance-Token': apiTokenInstance,
+					},
+					body: JSON.stringify(body)
+				});
+				const data = await response.text();
+				document.getElementById('response').value = data;
+			} catch (error) {
+				document.getElementById('response').value = `Ошибка: ${error.message}`;
+			}
+		}
+
+		function getSettings() {
+			callApi(`getSettings`);
+		}
+
+		function getStateInstance() {
+			callApi(`getStateInstance`);
+		}
+
+		function sendMessage() {
+			const chatId = document.getElementById('chatId').value;
+			const message = document.getElementById('message').value;
+
+			if (!chatId || !message) {
+				alert('Пожалуйста, заполните Chat ID и Message');
+				return;
+			}
+
+			const messageData = {
+				chatId: chatId,
+				message: message
+			};
+			callApiWithBody(`sendMessage`, messageData);
+		}
+
+		function sendFileByUrl() {
+			const chatId = document.getElementById('chatId').value;
+			const urlFile = document.getElementById('urlFile').value;
+			const fileName = document.getElementById('fileName').value;
+
+			if (!chatId || !urlFile || !fileName) {
+				alert('Пожалуйста, заполните Chat ID, URL файла и имя файла');
+				return;
+			}
+
+			const fileData = {
+				chatId: chatId,
+				urlFile: urlFile,
+				fileName: fileName
+			};
+			callApiWithBody(`sendFileByUrl`, fileData);
+		}
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "rest-api",
+  "version": "1.0.0",
+  "description": "rest-api server",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint --cache . --ext .js",
+    "lint-fix": "eslint --cache . --ext .js --fix"
+  },
+  "author": "Boris Panov",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.16.0 <21"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  }
+}

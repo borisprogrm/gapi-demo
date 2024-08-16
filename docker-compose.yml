@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: ./api
+    container_name: api
+    expose:
+      - "3000"
+    networks:
+      - internal_network
+
+  nginx:
+    build:
+      context: ./public
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
+    driver: bridge
